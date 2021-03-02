@@ -31,7 +31,8 @@ with open('start.html','r') as html_file:
     for course in course_cards:
         course_name = course.h5.text
         course_price = course.a.text
-        digits = ''.join(re.findall('\d+', course_price))
+        pattern = r"\d+"
+        digits = ''.join(re.findall(pattern, course_price))
 
         print(course_name + ' costs: $' + digits)
 
@@ -41,13 +42,14 @@ with open('start.html','r') as html_file:
         #print(i.text)
     
 #endregion
-'''   
+
 #region ONLINE WEBSITE
 url = 'https://ca.indeed.com/jobs?q=junior+software+developer&l=Vancouver%2C+BC'
 
 chrome_options = Options()
 chrome_options.add_argument("--headless")
-driver=webdriver.Chrome("C:/Users/Work/chromedriver", chrome_options=chrome_options)
+#driver=webdriver.Chrome("C:/Users/Work/chromedriver", chrome_options=chrome_options)
+driver=webdriver.Chrome("C:/Users/LenovoAdmin/chromedriver", chrome_options=chrome_options)
 get=driver.get(url)
 html=driver.page_source
 soup=BeautifulSoup(html,'html.parser')
@@ -70,11 +72,92 @@ Days Ago: {days_ago}
 Link: https://ca.indeed.com/{link} doesnt really work
 """)
 
-write('test')
-write('test')
-write('test')
+#endregion
+''' 
+#region Price Tracker
+url = 'https://www.amazon.ca/s?k='
+
+user_input = '+'.join(input("What would you like to check the price of? ").split(' '))
+url += user_input
+print(url)
+
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+#driver=webdriver.Chrome("C:/Users/Work/chromedriver", chrome_options=chrome_options)
+driver=webdriver.Chrome("C:/Users/LenovoAdmin/chromedriver", chrome_options=chrome_options)
+#driver=webdriver.Chrome("C:/Users/LenovoAdmin/chromedriver")
+get=driver.get(url)
+html=driver.page_source
+soup=BeautifulSoup(html,'html.parser')
+
+
+product = soup.find('div', class_='a-section a-spacing-medium')
+title = product.find('div', class_='a-section aok-relative s-image-square-aspect').img['alt']
+link = 'null'
+price_whole = product.find('span', class_='a-price-whole').text
+price_sub = product.find('span', class_='a-price-fraction')
+price = str(price_whole) + '.' + str(price_sub)
+print()
+print(title)
+print(price)
+
+#html_text = requests.get(url)
+#soup = BeautifulSoup(html_text, 'lxml')
+'''
+job = soup.find('div', class_='jobsearch-SerpJobCard unifiedRow row result clickcard')
+job_title = job.find_all('b')
+job_title = ' '.join([job.text for job in job_title])
+company_name = job.find(class_='company').text.strip('\n')
+days_ago = job.find('span', class_='date').text
+link = job.find('h2', class_='title').a['href']
+'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
