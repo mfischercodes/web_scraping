@@ -76,9 +76,9 @@ Link: https://ca.indeed.com/{link} doesnt really work
 ''' 
 #region Price Tracker
 url = 'https://www.amazon.ca/s?k='
-
-user_input = '+'.join(input("What would you like to check the price of? ").split(' '))
-url += user_input
+user_input = input("What would you like to check the price of? ")
+url_input = '+'.join(user_input.split(' '))
+url += url_input
 print(url)
 
 chrome_options = Options()
@@ -90,20 +90,82 @@ get=driver.get(url)
 html=driver.page_source
 soup=BeautifulSoup(html,'html.parser')
 
+#product = soup.find('div', class_='a-section a-spacing-medium')
+no_product = False
 
-product = soup.find('div', class_='a-section a-spacing-medium')
-title = product.find('div', class_='a-section aok-relative s-image-square-aspect').img['alt']
-link = 'null'
-price_whole = product.find('span', class_='a-price-whole').text
-price_sub = product.find('span', class_='a-price-fraction')
-price = str(price_whole) + '.' + str(price_sub)
-print()
-print(title)
-print(price)
+lowest_location = 'No Website'
+lowest_title = 'Error'
+lowest_price = 100000
+lowest_link = 'No Link'
+
+
+product = soup.find_all('div', class_='a-section a-spacing-medium')
+for i in range(3):
+
+    try: title = product[i].find('a', class_='a-link-normal a-text-normal').span.text
+    except: pass
+    
+    if 'case' in title.lower() and 'case' not in user_input.lower():
+        no_product = True
+
+    if no_product == False:
+        try: price_whole = product[i].find('span', class_='a-price-whole').text
+        except AttributeError: price_whole = 100000
+        
+        try: price_sub = product[i].find('span', class_='a-price-fraction').text
+        except AttributeError: price_sub = '00'
+
+        if price_whole == 100000:
+            price = 100000
+        else:
+            price = price_whole + price_sub
+        
+        if float(price) < float(lowest_price):
+            lowest_location = 'Amazon.ca'
+            lowest_title = title
+            lowest_price = price
+            lowest_link = 'No Link'
+
+    def price_printer(website = 'amazon.ca'):
+        print()
+        if website in url: print(website)
+        print(title)
+        if price == 100000:
+            print("Out of Stock")
+        else:
+            print(price)
+
+    no_product = False
+
+    if user_input in title.lower():
+        if 'case' not in title.lower():
+            price_printer()
+        elif 'case' in user_input.lower():
+            price_printer()
+            
+    else:
+        no_product = True
+    
+
+if no_product:
+    print("We did not find the product you were looking for.\
+        \nPlease make sure you typed in the correct name")
+    
+def lowest_price_func():
+    print(f"""
+Website: {lowest_location}
+Title: {lowest_title}
+Price: ${lowest_price}
+Link: {lowest_link} 
+""")
+
+lowest_price_func()
+
+'''
 
 #html_text = requests.get(url)
 #soup = BeautifulSoup(html_text, 'lxml')
-'''
+
 job = soup.find('div', class_='jobsearch-SerpJobCard unifiedRow row result clickcard')
 job_title = job.find_all('b')
 job_title = ' '.join([job.text for job in job_title])
@@ -140,7 +202,6 @@ link = job.find('h2', class_='title').a['href']
 
 
 #endregion
-
 
 
 
